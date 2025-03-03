@@ -1,43 +1,42 @@
-const http = require("node:http");
-const db = require("./db/connection");
+const http = require('http');
+const db = require('./db/connection');
 
-const server = http.createServer((request, response) => {
-    console.log(request.method, request.url)
-    if (request.method === "GET" && request.url === "/api") {
+const server = http.createServer((request, response) => { 
+    const { method, url } = request
+    
+    if (method === 'GET' && url === "/api") {
+        response.setHeader("content-type", "application/json"); // X
         response.statusCode = 200;
-        response.setHeader("content-type", "application/json");
-        response.write(JSON.stringify({ msg: "hello world!" }));
-        response.end();
+        response.write(JSON.stringify({ msg: "Hello world" }));
+        response.end(); // X
     }
-
-    if (request.method === 'GET' && request.url === '/api/snacks') { 
-        return db.query(`SELECT * FROM snacks`).then(({rows}) => { 
+    if (method === 'GET' && url === '/api/snacks') { 
+        return db.query(`SELECT * FROM snacks`).then(({ rows }) => {
+            console.log(rows)
             response.setHeader("content-type", "application/json")
             response.statusCode = 200
             response.write(JSON.stringify({ snacks: rows }))
             response.end()
         })
     }
-
-    if (request.method === 'POST' && request.url === '/api/snacks') { 
+    if (method === 'POST' && url === '/api/snacks') { 
         let body = ""
         request.on("data", (packet) => { 
-           body += packet
+            body += packet
         })
 
         request.on("end", () => { 
-            const parsedBody = JSON.parse(body)
-            console.log(parsedBody)
+            const {snack_name, snack_description, price_in_pence, category_id} = JSON.parse(body)
 
-            return db.query(`INSERT INTO snacks (snack_name, snack_description, category_id, price_in_pence) VALUES ($1, $2, $3, $4)`, [parsedBody.snack_name, parsedBody.snack_description, parsedBody.category_id, parsedBody.price_in_pence])
+            return db.query(`INSERT INTO snacks (snack_name, snack_description, price_in_pence, category_id) VALUES ($1, $2, $3, $4)`, [snack_name, snack_description, price_in_pence, category_id])
         })
     }
 });
 
-server.listen(8000, (err) => { 
+server.listen(9090, (err) => { 
     if (err) {
         console.log(err);
     } else { 
-        console.log("listening on 8000")
+        console.log("listening on 9090")
     }
 })
