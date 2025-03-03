@@ -5,13 +5,12 @@ const server = http.createServer((request, response) => {
     const { method, url } = request
     
     if (method === 'GET' && url === "/api") {
-        response.setHeader("content-type", "application/json");
+        response.setHeader("content-type", "application/json"); // X
         response.statusCode = 200;
         response.write(JSON.stringify({ msg: "Hello world" }));
-        response.end();
+        response.end(); // X
     }
     if (method === 'GET' && url === '/api/snacks') { 
-        console.log("GETTING SNACKS")
         return db.query(`SELECT * FROM snacks`).then(({ rows }) => {
             console.log(rows)
             response.setHeader("content-type", "application/json")
