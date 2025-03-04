@@ -23,7 +23,13 @@ app.get('/api/snacks/:snack_id', (request, response) => {
 })
 
 app.post('/api/snacks', (request, response) => { 
-    console.log(request.body)
+    const { snack_name, snack_description, price_in_pence, category_id } = request.body
+
+    return db.query(`INSERT INTO snacks (snack_name, snack_description, price_in_pence, category_id) VALUES ($1, $2, $3, $4) RETURNING *`, [snack_name, snack_description, price_in_pence, category_id]).then(({ rows }) => { 
+        response.status(201).send({snack: rows[0]})
+    })
+
+
 
 })
 
