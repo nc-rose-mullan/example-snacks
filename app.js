@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const db = require("./db/connection")
+const getSnackById = require("./controllers/snacks.controllers.js")
 
 app.use(express.json())
 
@@ -14,13 +15,7 @@ app.get('/api/snacks', (request, response) => {
     })
 })
 
-app.get('/api/snacks/:snack_id', (request, response) => {
-    const { snack_id } = request.params;
-    return db.query(`SELECT * FROM snacks WHERE snack_id = $1`, [snack_id])
-        .then(({ rows }) => { 
-        response.status(200).send({ snack: rows[0] })
-    }) 
-})
+app.get('/api/snacks/:snack_id', getSnackById)
 
 app.post('/api/snacks', (request, response) => { 
     const { snack_name, snack_description, price_in_pence, category_id } = request.body
